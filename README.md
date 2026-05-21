@@ -6,24 +6,18 @@ A multi-agent AI system that conducts realistic mock interviews and provides str
 
 ## Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────┐
-│                    Frontend (SPA)                    │
-│   Setup → Live Interview Chat → Feedback Report     │
-└──────────────────────┬──────────────────────────────┘
-                       │ REST API
-┌──────────────────────▼──────────────────────────────┐
-│                 FastAPI Backend                       │
-│                                                      │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
-│  │  Interviewer │  │  Evaluator  │  │    Coach     │  │
-│  │   Agent      │  │   Agent     │  │   Agent      │  │
-│  │             │  │  (silent)   │  │  (end only)  │  │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  │
-│         │                │                │          │
-│         └────────────────┴────────────────┘          │
-│                     Groq API (Llama 3)               │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A[Frontend SPA\nSetup → Live Interview Chat → Feedback Report]
+    A -->|REST API| B
+
+    subgraph B[FastAPI Backend]
+        C[Interviewer Agent]
+        D[Evaluator Agent\nsilent]
+        E[Coach Agent\nend only]
+    end
+
+    B --> F[Groq API — Llama 3]
 ```
 
 ### Agent Descriptions
@@ -105,8 +99,8 @@ Open [http://localhost:8000](http://localhost:8000) in your browser.
 
 | Method | Endpoint | Body | Returns |
 |--------|----------|------|---------|
-| `GET` | `/` | — | Frontend HTML |
-| `GET` | `/health` | — | `{ "status": "ok" }` |
+| `GET` | `/` | - | Frontend HTML |
+| `GET` | `/health` | - | `{ "status": "ok" }` |
 | `POST` | `/start` | `{ role, background, focus_area }` | `{ session_id, message, turn }` |
 | `POST` | `/answer` | `{ session_id, answer }` | `{ message, turn, interview_done }` |
 | `POST` | `/feedback` | `{ session_id }` | `{ feedback_markdown }` |
@@ -118,15 +112,15 @@ Open [http://localhost:8000](http://localhost:8000) in your browser.
 
 ```
 ai-mock-interview-coach/
-├── main.py              # FastAPI app, agent functions, orchestration
-├── index.html           # Complete frontend (HTML + CSS + JS, single file)
-├── requirements.txt     # Python dependencies
-├── .env                 # API key (not committed)
-├── prompts/
-│   ├── interviewer.txt  # Interviewer agent system prompt
-│   ├── evaluator.txt    # Evaluator agent system prompt
-│   └── coach.txt        # Coach agent system prompt
-└── README.md
+├- main.py              # FastAPI app, agent functions, orchestration
+├- index.html           # Complete frontend (HTML + CSS + JS, single file)
+├- requirements.txt     # Python dependencies
+├- .env                 # API key (not committed)
+├- prompts/
+│   ├- interviewer.txt  # Interviewer agent system prompt
+│   ├- evaluator.txt    # Evaluator agent system prompt
+│   └- coach.txt        # Coach agent system prompt
+└- README.md
 ```
 
 ---
@@ -163,7 +157,7 @@ The entire frontend lives in `index.html` — no build step, no bundler, no depe
 >
 > **AI:** That's a well-structured answer. The feature flag decision shows good risk management instinct. Let me probe one layer deeper — what would you have done if the 72-hour metrics had gone the other direction? Did you have a rollback plan beyond "turn off the flag"?
 >
-> **Candidate:** Yes — we had a communication plan drafted for the partnership team, and I'd already talked to engineering about the rollback procedure so it was a 15-minute operation, not a crisis. The harder question would have been whether to delay the partnership launch or ship the old flow. I think we would have shipped the old flow; a bad first impression at scale is worse than a delayed launch.
+> **Candidate:** Yes - we had a communication plan drafted for the partnership team, and I'd already talked to engineering about the rollback procedure so it was a 15-minute operation, not a crisis. The harder question would have been whether to delay the partnership launch or ship the old flow. I think we would have shipped the old flow; a bad first impression at scale is worse than a delayed launch.
 >
 > **AI:** Good. That shows you thought through second-order consequences. Let's shift to a different area...
 

@@ -89,7 +89,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── SCREEN 1 — SETUP ── */
+        /* - SCREEN 1 — SETUP - */
         .setup-header { text-align: center; margin-bottom: 48px; margin-top: 10vh; }
 
         .setup-header .logo-icon {
@@ -157,7 +157,7 @@
             color: var(--text-muted);
         }
 
-        /* ── BUTTONS ── */
+        /* - BUTTONS - */
         .btn {
             display: inline-flex; align-items: center; justify-content: center;
             gap: 8px; padding: 14px 28px; font-family: var(--font-mono);
@@ -183,7 +183,7 @@
         .btn-secondary:hover { background: var(--bg-card); border-color: var(--accent-blue); }
         .btn-full { width: 100%; }
 
-        /* ── SCREEN 2 — INTERVIEW ── */
+        /* - SCREEN 2 — INTERVIEW - */
         /* FIX 1: proper flex column so chat area fills remaining space and scrolls correctly */
         #screen-interview.active {
             height: 100vh;
@@ -324,7 +324,7 @@
         .feedback-prompt.visible { display: flex; flex-direction: column; align-items: center; }
         .feedback-prompt p { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 16px; }
 
-        /* ── SCREEN 3 — FEEDBACK ── */
+        /* - SCREEN 3 — FEEDBACK - */
         .feedback-header { text-align: center; margin-bottom: 32px; padding-top: 16px; }
         .feedback-header h2 { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; color: var(--text-heading); margin-bottom: 4px; }
         .feedback-header p { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
@@ -360,7 +360,7 @@
 
         .feedback-actions { text-align: center; padding: 32px 0 16px; }
 
-        /* ── UTILITIES ── */
+        /* - UTILITIES - */
         .hidden { display: none !important; }
 
         .error-toast {
@@ -580,7 +580,7 @@
         }
     });
 
-    /* ── SETUP ── */
+    /* - SETUP - */
     setupForm.addEventListener('submit', async e => {
         e.preventDefault();
         const role = roleInput.value.trim();
@@ -613,7 +613,7 @@
         }
     });
 
-    /* ── SEND ANSWER ── */
+    /* - SEND ANSWER - */
     btnSend.addEventListener('click', handleSendAnswer);
 
     async function handleSendAnswer() {
@@ -648,7 +648,7 @@
         }
     }
 
-    /* ── MIC / AUDIO ── */
+    /* - MIC / AUDIO - */
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
@@ -706,7 +706,7 @@
         }
     });
 
-    /* ── FEEDBACK ── */
+    /* - FEEDBACK - */
     btnFeedback.addEventListener('click', async () => {
         showScreen('feedback');
         feedbackLoading.classList.remove('hidden');
@@ -735,7 +735,7 @@
         }
     });
 
-    /* ── RESTART ── */
+    /* - RESTART - */
     btnRestart.addEventListener('click', () => {
         state.sessionId = null; state.turn = 1; state.interviewDone = false;
         chatArea.querySelectorAll('.chat-bubble').forEach(b => b.remove());
@@ -748,7 +748,7 @@
         showScreen('setup');
     });
 
-    /* ── MARKDOWN RENDERER ──
+    /* - MARKDOWN RENDERER -
        FIX 2: process block-level list items BEFORE inline em/strong
        so "* text" lines become <li>, not <em>text</em>
     */
