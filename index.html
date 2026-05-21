@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Interview Coach</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f35;
+            --bg-input: #0d1224;
+            --bg-bubble-ai: #1e2740;
+            --bg-bubble-user: #2563eb;
+            --border-subtle: #1e293b;
+            --border-focus: #3b82f6;
+            --border-glow: rgba(59,130,246,0.3);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --text-accent: #60a5fa;
+            --text-heading: #f8fafc;
+            --accent-blue: #3b82f6;
+            --accent-rose: #fb7185;
+            --gradient-primary: linear-gradient(135deg,#3b82f6,#8b5cf6);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 20px rgba(59,130,246,0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --font-mono: 'IBM Plex Mono','Fira Code',monospace;
+            --font-heading: 'Playfair Display',Georgia,serif;
+            --font-body: 'Inter',-apple-system,sans-serif;
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+            --transition-slow: 400ms cubic-bezier(0.4,0,0.2,1);
+        }
+
+        html { font-size: 16px; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; overflow: hidden;
+        }
+        .ambient-bg::before {
+            content: ''; position: absolute; top: -30%; left: -20%;
+            width: 70%; height: 70%;
+            background: radial-gradient(circle,rgba(59,130,246,0.06) 0%,transparent 70%);
+            animation: ambientFloat 20s ease-in-out infinite;
+        }
+        .ambient-bg::after {
+            content: ''; position: absolute; bottom: -20%; right: -20%;
+            width: 60%; height: 60%;
+            background: radial-gradient(circle,rgba(139,92,246,0.05) 0%,transparent 70%);
+            animation: ambientFloat 25s ease-in-out infinite reverse;
+        }
+        @keyframes ambientFloat {
+            0%,100% { transform: translate(0,0); }
+            33% { transform: translate(5%,-3%); }
+            66% { transform: translate(-3%,5%); }
+        }
+
+        .app-container {
+            position: relative; z-index: 1;
+            max-width: 720px; margin: 0 auto;
+            padding: 24px 20px; min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        .screen { display: none; flex-direction: column; flex: 1; animation: fadeSlideIn 0.5s var(--transition-slow) both; }
+        .screen.active { display: flex; }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── SCREEN 1 — SETUP ── */
+        .setup-header { text-align: center; margin-bottom: 48px; margin-top: 10vh; }
+
+        .setup-header .logo-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 56px; height: 56px; border-radius: var(--radius-md);
+            background: var(--gradient-primary); margin-bottom: 20px;
+            box-shadow: var(--shadow-glow);
+        }
+        .setup-header .logo-icon svg {
+            width: 28px; height: 28px; fill: none; stroke: #fff;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        .setup-header h1 {
+            font-family: var(--font-heading); font-size: 2.4rem; font-weight: 800;
+            color: var(--text-heading); letter-spacing: -0.02em; margin-bottom: 10px;
+        }
+
+        .setup-header .tagline {
+            font-family: var(--font-body); font-size: 0.95rem; font-weight: 400;
+            color: var(--text-secondary); letter-spacing: 0.01em;
+            font-style: italic;
+        }
+
+        .setup-form {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-lg);
+        }
+
+        .form-group { margin-bottom: 24px; }
+
+        .form-group label {
+            display: block; font-family: var(--font-mono); font-size: 0.75rem;
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--text-secondary); margin-bottom: 8px;
+        }
+        .form-group label .required { color: var(--accent-rose); margin-left: 2px; }
+
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%; padding: 12px 16px;
+            font-family: var(--font-mono); font-size: 0.9rem;
+            color: var(--text-primary); background: var(--bg-input);
+            border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+            outline: none; transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--border-glow);
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-group select {
+            cursor: pointer; -webkit-appearance: none; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+        }
+        .form-group select option { background: var(--bg-secondary); color: var(--text-primary); }
+
+        /* FIX 3: placeholder — Inter regular, not monospace italic */
+        .form-group ::placeholder {
+            font-family: var(--font-body);
+            font-style: normal;
+            color: var(--text-muted);
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 14px 28px; font-family: var(--font-mono);
+            font-size: 0.85rem; font-weight: 600; letter-spacing: 0.04em;
+            text-transform: uppercase; border: none; border-radius: var(--radius-sm);
+            cursor: pointer; transition: all var(--transition-normal);
+            position: relative; overflow: hidden;
+        }
+        .btn::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(rgba(255,255,255,0.1),transparent);
+            opacity: 0; transition: opacity var(--transition-fast);
+        }
+        .btn:hover::after { opacity: 1; }
+        .btn-primary {
+            background: var(--gradient-primary); color: #fff;
+            box-shadow: var(--shadow-md), var(--shadow-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg), 0 0 30px rgba(59,130,246,0.25); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: transparent; color: var(--text-accent); border: 1px solid var(--border-subtle); }
+        .btn-secondary:hover { background: var(--bg-card); border-color: var(--accent-blue); }
+        .btn-full { width: 100%; }
+
+        /* ── SCREEN 2 — INTERVIEW ── */
+        /* FIX 1: proper flex column so chat area fills remaining space and scrolls correctly */
+        #screen-interview.active {
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+
+        .interview-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle);
+            flex-shrink: 0;
+        }
+        .interview-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 12px; font-family: var(--font-mono); font-size: 0.7rem;
+            font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+            border-radius: 100px; background: rgba(59,130,246,0.1);
+            color: var(--text-accent); border: 1px solid rgba(59,130,246,0.2);
+        }
+        .badge.focus { background: rgba(139,92,246,0.1); color: #a78bfa; border-color: rgba(139,92,246,0.2); }
+        .turn-counter { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
+        .turn-counter span { color: var(--text-accent); font-weight: 600; }
+
+        /* FIX 1: chat-area takes all remaining vertical space, scrolls internally */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 0; /* critical: allows flex child to shrink below content size */
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-subtle) transparent;
+        }
+        .chat-area::-webkit-scrollbar { width: 5px; }
+        .chat-area::-webkit-scrollbar-track { background: transparent; }
+        .chat-area::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 100px; }
+
+        .chat-bubble {
+            max-width: 85%; padding: 14px 18px;
+            border-radius: var(--radius-md); font-size: 0.92rem; line-height: 1.6;
+            animation: bubbleIn 0.35s ease both;
+        }
+        @keyframes bubbleIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .chat-bubble.ai {
+            align-self: flex-start; background: var(--bg-bubble-ai);
+            border: 1px solid var(--border-subtle); border-bottom-left-radius: 4px;
+        }
+        .chat-bubble.ai::before {
+            content: '▸ AI'; display: block; font-family: var(--font-mono);
+            font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--text-accent); margin-bottom: 6px; opacity: 0.8;
+        }
+        .chat-bubble.user {
+            align-self: flex-end; background: var(--bg-bubble-user);
+            border-bottom-right-radius: 4px; color: #fff;
+        }
+        .chat-bubble.user::before {
+            content: 'You'; display: block; font-family: var(--font-mono);
+            font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.08em; color: rgba(255,255,255,0.6); margin-bottom: 6px;
+        }
+
+        .typing-indicator {
+            align-self: flex-start; display: none; align-items: center; gap: 6px;
+            padding: 14px 18px; background: var(--bg-bubble-ai);
+            border: 1px solid var(--border-subtle); border-radius: var(--radius-md);
+            border-bottom-left-radius: 4px;
+        }
+        .typing-indicator.visible { display: flex; }
+        .typing-indicator .dot {
+            width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted);
+            animation: typingBounce 1.4s infinite both;
+        }
+        .typing-indicator .dot:nth-child(2) { animation-delay: 0.15s; }
+        .typing-indicator .dot:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes typingBounce {
+            0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-6px); opacity: 1; }
+        }
+        .typing-indicator .typing-text { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); margin-left: 4px; }
+
+        /* Input area — flex-shrink: 0 so it never compresses */
+        .input-area {
+            padding: 12px 0 8px;
+            border-top: 1px solid var(--border-subtle);
+            display: flex; gap: 8px; align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .input-area textarea {
+            flex: 1; padding: 11px 14px;
+            /* FIX 3: placeholder font inherited — use Inter not mono */
+            font-family: var(--font-mono); font-size: 0.88rem;
+            color: var(--text-primary); background: var(--bg-input);
+            border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+            outline: none; resize: none; overflow-y: auto;
+            line-height: 1.5; min-height: 44px;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        .input-area textarea:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--border-glow); }
+        /* FIX 3: chat input placeholder */
+        .input-area textarea::placeholder {
+            font-family: var(--font-body);
+            font-style: normal;
+            color: var(--text-muted);
+        }
+
+        .btn-send { padding: 11px 18px; min-height: 44px; flex-shrink: 0; }
+
+        /* Mic button */
+        .btn-mic {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px; flex-shrink: 0;
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm); cursor: pointer;
+            transition: all var(--transition-normal); color: var(--text-secondary);
+        }
+        .btn-mic:hover { border-color: var(--accent-blue); color: var(--text-accent); }
+        .btn-mic.recording {
+            background: rgba(251,113,133,0.15); border-color: var(--accent-rose);
+            color: var(--accent-rose); animation: micPulse 1s ease-in-out infinite;
+        }
+        .btn-mic.transcribing { opacity: 0.5; cursor: not-allowed; }
+        @keyframes micPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(251,113,133,0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(251,113,133,0); }
+        }
+        .btn-mic svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .feedback-prompt { display: none; text-align: center; padding: 24px 0; animation: fadeSlideIn 0.5s ease both; flex-shrink: 0; }
+        .feedback-prompt.visible { display: flex; flex-direction: column; align-items: center; }
+        .feedback-prompt p { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 16px; }
+
+        /* ── SCREEN 3 — FEEDBACK ── */
+        .feedback-header { text-align: center; margin-bottom: 32px; padding-top: 16px; }
+        .feedback-header h2 { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; color: var(--text-heading); margin-bottom: 4px; }
+        .feedback-header p { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
+
+        .feedback-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 20px; }
+        .feedback-loading .spinner { width: 40px; height: 40px; border: 3px solid var(--border-subtle); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .feedback-loading p { font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-muted); }
+
+        .feedback-content {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg); padding: 36px 32px;
+            box-shadow: var(--shadow-lg); line-height: 1.7;
+        }
+        .feedback-content h1,
+        .feedback-content h2 { font-family: var(--font-heading); font-size: 1.35rem; font-weight: 700; color: var(--text-heading); margin-top: 32px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle); }
+        .feedback-content h1:first-child,
+        .feedback-content h2:first-child { margin-top: 0; }
+        .feedback-content h3 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: var(--text-heading); margin-top: 20px; margin-bottom: 8px; }
+        .feedback-content p { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.92rem; }
+        .feedback-content ul, .feedback-content ol { padding-left: 20px; margin-bottom: 16px; }
+        .feedback-content li { color: var(--text-secondary); margin-bottom: 8px; font-size: 0.92rem; }
+        .feedback-content strong { color: var(--text-primary); }
+        .feedback-content hr { border: none; border-top: 1px solid var(--border-subtle); margin: 24px 0; }
+
+        .feedback-content blockquote { display: none; }
+
+        .feedback-content table { width: 100%; border-collapse: collapse; margin: 16px 0; font-family: var(--font-mono); font-size: 0.82rem; }
+        .feedback-content thead th { background: var(--bg-secondary); color: var(--text-accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.72rem; padding: 10px 14px; text-align: left; border-bottom: 2px solid var(--border-subtle); }
+        .feedback-content tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
+        .feedback-content tbody tr:last-child td { border-bottom: none; }
+        .feedback-content tbody tr:hover { background: rgba(59,130,246,0.04); }
+
+        .feedback-actions { text-align: center; padding: 32px 0 16px; }
+
+        /* ── UTILITIES ── */
+        .hidden { display: none !important; }
+
+        .error-toast {
+            position: fixed; top: 0; left: 0; right: 0;
+            transform: translateY(-100%);
+            background: linear-gradient(135deg,#7f1d1d,#991b1b);
+            color: #fca5a5; padding: 14px 24px;
+            font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.5;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5); z-index: 100;
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+            text-align: center; word-break: break-word;
+        }
+        .error-toast.visible { transform: translateY(0); }
+
+        @media (max-width: 600px) {
+            .app-container { padding: 16px 14px; }
+            .setup-header { margin-top: 5vh; margin-bottom: 32px; }
+            .setup-header h1 { font-size: 1.8rem; }
+            .setup-form { padding: 24px 18px; }
+            .chat-bubble { max-width: 92%; }
+            .feedback-content { padding: 24px 18px; }
+            .interview-header { flex-direction: column; gap: 8px; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ambient-bg"></div>
+
+<div class="app-container">
+
+    <!-- SCREEN 1 — SETUP -->
+    <div id="screen-setup" class="screen active">
+        <div class="setup-header">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+            </div>
+            <h1>Mock Interview Coach</h1>
+            <p class="tagline">AI-powered practice sessions with real feedback</p>
+        </div>
+
+        <form class="setup-form" id="setup-form">
+            <div class="form-group">
+                <label for="role">Target Role <span class="required">*</span></label>
+                <input type="text" id="role" placeholder="e.g. Senior Product Manager at Google" required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="background">Your Background</label>
+                <textarea id="background" rows="3" placeholder="e.g. 2nd year CS student, 1 internship in web dev"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="focus-area">Focus Area</label>
+                <select id="focus-area">
+                    <option value="behavioral">Behavioral</option>
+                    <option value="technical">Technical</option>
+                    <option value="case">Case Study</option>
+                    <option value="mixed" selected>Mixed</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="btn-start">
+                Start Interview →
+            </button>
+        </form>
+    </div>
+
+    <!-- SCREEN 2 — INTERVIEW -->
+    <div id="screen-interview" class="screen">
+        <div class="interview-header">
+            <div class="interview-badges">
+                <span class="badge" id="badge-role"></span>
+                <span class="badge focus" id="badge-focus"></span>
+            </div>
+            <div class="turn-counter">Turn <span id="turn-num">1</span> of ~10</div>
+        </div>
+
+        <div class="chat-area" id="chat-area">
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                <span class="typing-text">Interviewer is thinking…</span>
+            </div>
+        </div>
+
+        <div class="input-area" id="input-area">
+            <button class="btn-mic" id="btn-mic" title="Record answer" type="button">
+                <svg id="mic-icon" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+            </button>
+            <textarea id="user-input" rows="1" placeholder="Type your answer or use the mic…"></textarea>
+            <button class="btn btn-primary btn-send" id="btn-send" type="button">Send</button>
+        </div>
+
+        <div class="feedback-prompt" id="feedback-prompt">
+            <p>The interview is complete. Ready to see how you did?</p>
+            <button class="btn btn-primary" id="btn-feedback" type="button">View Feedback →</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 3 — FEEDBACK -->
+    <div id="screen-feedback" class="screen">
+        <div class="feedback-header">
+            <h2>Your Feedback Report</h2>
+            <p>Detailed analysis of your performance</p>
+        </div>
+
+        <div class="feedback-loading" id="feedback-loading">
+            <div class="spinner"></div>
+            <p>Coach is analyzing your interview…</p>
+        </div>
+
+        <div class="feedback-content hidden" id="feedback-content"></div>
+
+        <div class="feedback-actions hidden" id="feedback-actions">
+            <button class="btn btn-secondary" id="btn-restart" type="button">Start New Interview</button>
+        </div>
+    </div>
+
+</div>
+
+<div class="error-toast" id="error-toast"></div>
+
+<script>
+    const state = {
+        sessionId: null, role: '', focusArea: '',
+        turn: 1, interviewDone: false, loading: false,
+    };
+
+    const API_BASE = '';
+    const $ = sel => document.querySelector(sel);
+
+    const screens      = { setup: $('#screen-setup'), interview: $('#screen-interview'), feedback: $('#screen-feedback') };
+    const setupForm    = $('#setup-form');
+    const roleInput    = $('#role');
+    const bgInput      = $('#background');
+    const focusSelect  = $('#focus-area');
+    const btnStart     = $('#btn-start');
+    const chatArea     = $('#chat-area');
+    const userInput    = $('#user-input');
+    const btnSend      = $('#btn-send');
+    const btnMic       = $('#btn-mic');
+    const micIcon      = $('#mic-icon');
+    const inputArea    = $('#input-area');
+    const typing       = $('#typing-indicator');
+    const turnNum      = $('#turn-num');
+    const badgeRole    = $('#badge-role');
+    const badgeFocus   = $('#badge-focus');
+    const feedbackPrompt  = $('#feedback-prompt');
+    const btnFeedback  = $('#btn-feedback');
+    const feedbackLoading = $('#feedback-loading');
+    const feedbackContent = $('#feedback-content');
+    const feedbackActions = $('#feedback-actions');
+    const btnRestart   = $('#btn-restart');
+    const errorToast   = $('#error-toast');
+
+    function showScreen(name) {
+        Object.values(screens).forEach(s => s.classList.remove('active'));
+        screens[name].classList.add('active');
+    }
+
+    let toastTimeout;
+    function showError(msg) {
+        errorToast.textContent = msg;
+        errorToast.classList.add('visible');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => errorToast.classList.remove('visible'), 5000);
+    }
+
+    async function apiPost(endpoint, body) {
+        const res = await fetch(API_BASE + endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ detail: 'Unknown error' }));
+            throw new Error(err.detail || 'HTTP ' + res.status);
+        }
+        return res.json();
+    }
+
+    function addBubble(text, type) {
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble ' + type;
+        bubble.textContent = text;
+        chatArea.insertBefore(bubble, typing);
+        scrollChat();
+    }
+
+    // FIX 1: scroll the chat area itself, not the page
+    function scrollChat() {
+        requestAnimationFrame(() => { chatArea.scrollTop = chatArea.scrollHeight; });
+    }
+
+    function showTyping(show) {
+        typing.classList.toggle('visible', show);
+        if (show) scrollChat();
+    }
+
+    function setLoading(on) {
+        state.loading = on;
+        btnSend.disabled = on;
+        btnStart.disabled = on;
+        userInput.disabled = on;
+    }
+
+    /* Auto-resize textarea */
+    function resizeTextarea() {
+        userInput.style.height = 'auto';
+        const newH = Math.min(userInput.scrollHeight, 160);
+        userInput.style.height = newH + 'px';
+    }
+
+    userInput.addEventListener('input', resizeTextarea);
+
+    userInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!state.loading && userInput.value.trim()) handleSendAnswer();
+        }
+    });
+
+    /* ── SETUP ── */
+    setupForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const role = roleInput.value.trim();
+        const background = bgInput.value.trim();
+        const focus_area = focusSelect.value;
+        if (!role) return;
+
+        setLoading(true);
+        btnStart.textContent = 'Starting…';
+        try {
+            const data = await apiPost('/start', { role, background, focus_area });
+            state.sessionId = data.session_id;
+            state.role = role;
+            state.focusArea = focus_area;
+            state.turn = data.turn;
+            state.interviewDone = false;
+
+            badgeRole.textContent = role;
+            badgeFocus.textContent = focus_area;
+            turnNum.textContent = data.turn;
+
+            showScreen('interview');
+            addBubble(data.message, 'ai');
+            userInput.focus();
+        } catch (err) {
+            showError(err.message);
+        } finally {
+            setLoading(false);
+            btnStart.textContent = 'Start Interview →';
+        }
+    });
+
+    /* ── SEND ANSWER ── */
+    btnSend.addEventListener('click', handleSendAnswer);
+
+    async function handleSendAnswer() {
+        const answer = userInput.value.trim();
+        if (!answer || state.loading) return;
+
+        addBubble(answer, 'user');
+        userInput.value = '';
+        userInput.style.height = 'auto';
+
+        setLoading(true);
+        showTyping(true);
+
+        try {
+            const data = await apiPost('/answer', { session_id: state.sessionId, answer });
+            showTyping(false);
+            addBubble(data.message, 'ai');
+            state.turn = data.turn;
+            turnNum.textContent = data.turn;
+
+            if (data.interview_done) {
+                state.interviewDone = true;
+                inputArea.classList.add('hidden');
+                feedbackPrompt.classList.add('visible');
+            }
+        } catch (err) {
+            showTyping(false);
+            showError(err.message);
+        } finally {
+            setLoading(false);
+            if (!state.interviewDone) userInput.focus();
+        }
+    }
+
+    /* ── MIC / AUDIO ── */
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    const MIC_SVG = `<svg id="mic-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>`;
+    const STOP_SVG = `<svg id="mic-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" stroke="none"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>`;
+
+    btnMic.addEventListener('click', async () => {
+        if (state.loading) return;
+
+        if (!isRecording) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+                mediaRecorder.onstop = async () => {
+                    stream.getTracks().forEach(t => t.stop());
+                    btnMic.classList.remove('recording');
+                    btnMic.classList.add('transcribing');
+                    btnMic.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
+                    btnMic.disabled = true;
+
+                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const form = new FormData();
+                    form.append('audio', blob, 'recording.webm');
+
+                    try {
+                        const res = await fetch(API_BASE + '/transcribe', { method: 'POST', body: form });
+                        if (!res.ok) throw new Error('Transcription failed');
+                        const data = await res.json();
+                        if (data.transcript) {
+                            userInput.value = data.transcript;
+                            resizeTextarea();
+                            userInput.focus();
+                        }
+                    } catch (err) {
+                        showError('Transcription failed: ' + err.message);
+                    } finally {
+                        btnMic.classList.remove('transcribing');
+                        btnMic.disabled = false;
+                        btnMic.innerHTML = MIC_SVG;
+                    }
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                btnMic.classList.add('recording');
+                btnMic.innerHTML = STOP_SVG;
+            } catch (err) {
+                showError('Microphone access denied. Please allow mic permissions.');
+            }
+        } else {
+            isRecording = false;
+            mediaRecorder.stop();
+        }
+    });
+
+    /* ── FEEDBACK ── */
+    btnFeedback.addEventListener('click', async () => {
+        showScreen('feedback');
+        feedbackLoading.classList.remove('hidden');
+        feedbackContent.classList.add('hidden');
+        feedbackActions.classList.add('hidden');
+
+        try {
+            const data = await apiPost('/feedback', { session_id: state.sessionId });
+            let md = data.feedback_markdown || '';
+            md = md.replace(/\n\*?\*?Note:?.*$/is, '').trim();
+            feedbackContent.innerHTML = renderMarkdown(md);
+            feedbackLoading.classList.add('hidden');
+            feedbackContent.classList.remove('hidden');
+            feedbackActions.classList.remove('hidden');
+        } catch (err) {
+            feedbackLoading.classList.add('hidden');
+            // Show inline error so screen isn't blank
+            feedbackContent.innerHTML = `
+                <div style="text-align:center; padding: 40px 20px;">
+                    <div style="font-size: 2rem; margin-bottom: 16px;">⚠️</div>
+                    <p style="color: var(--accent-rose); font-family: var(--font-mono); font-size: 0.85rem; margin-bottom: 8px; font-weight: 600;">Failed to load feedback</p>
+                    <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 24px;">${err.message}</p>
+                    <button class="btn btn-secondary" onclick="document.getElementById('screen-feedback').classList.remove('active'); document.getElementById('screen-interview').classList.add('active');">← Back to Interview</button>
+                </div>`;
+            feedbackContent.classList.remove('hidden');
+        }
+    });
+
+    /* ── RESTART ── */
+    btnRestart.addEventListener('click', () => {
+        state.sessionId = null; state.turn = 1; state.interviewDone = false;
+        chatArea.querySelectorAll('.chat-bubble').forEach(b => b.remove());
+        roleInput.value = ''; bgInput.value = ''; focusSelect.value = 'mixed';
+        inputArea.classList.remove('hidden');
+        feedbackPrompt.classList.remove('visible');
+        feedbackContent.innerHTML = '';
+        feedbackContent.classList.add('hidden');
+        feedbackActions.classList.add('hidden');
+        showScreen('setup');
+    });
+
+    /* ── MARKDOWN RENDERER ──
+       FIX 2: process block-level list items BEFORE inline em/strong
+       so "* text" lines become <li>, not <em>text</em>
+    */
+    function renderMarkdown(md) {
+        if (!md) return '';
+        let h = md
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+        // Tables (before anything else)
+        h = h.replace(/^(\|.+\|)\n(\|[\s\-:|]+\|)\n((?:\|.+\|\n?)*)/gm, (_, hr, sr, br) => {
+            const heads = hr.split('|').filter(c=>c.trim()).map(c=>`<th>${c.trim()}</th>`).join('');
+            const rows  = br.trim().split('\n').map(row=>{
+                const cells = row.split('|').filter(c=>c.trim()).map(c=>`<td>${c.trim().replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</td>`).join('');
+                return `<tr>${cells}</tr>`;
+            }).join('');
+            return `<table><thead><tr>${heads}</tr></thead><tbody>${rows}</tbody></table>`;
+        });
+
+        // Headings
+        h = h
+            .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+            .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+            .replace(/^# (.+)$/gm,'<h1>$1</h1>');
+
+        // HR
+        h = h.replace(/^---$/gm,'<hr>');
+
+        // FIX 2: list items BEFORE inline bold/em so "* foo" → <li>, not <em>foo</em>
+        // Ordered lists
+        h = h.replace(/^\d+\.\s+(.+)$/gm,'<li>$1</li>');
+        // Unordered: "* ", "- ", "• " at line start
+        h = h.replace(/^[*\-•]\s+(.+)$/gm,'<li>$1</li>');
+        // Wrap consecutive <li> blocks
+        h = h.replace(/((?:<li>[\s\S]+?<\/li>\n?)+)/g,'<ul>$1</ul>');
+
+        // Inline bold then em (after list items are already wrapped)
+        h = h
+            .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g,'<em>$1</em>');
+
+        // Paragraphs — lines not already wrapped in a block tag
+        h = h.replace(/^(?!<[a-z\/])((?!<\/)[^\n]+)$/gm,'<p>$1</p>');
+
+        return h;
+    }
+</script>
+</body>
+</html>
